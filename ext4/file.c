@@ -461,6 +461,10 @@ static int ext4_file_open(struct inode * inode, struct file * filp)
 /*
  * ext4_llseek() 通过调用generic_file_llseek_size()
  * 以及每个值的相应maxbytes值来处理块映射和扩展区映射的maxbytes值。
+ *
+ * 改变文件中当前的读/写位置，并将新位置作为(正的)返回值
+ * offset: 
+ *
  */
 loff_t ext4_llseek(struct file *file, loff_t offset, int whence)
 {
