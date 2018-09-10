@@ -733,7 +733,7 @@ static unsigned long __fget_light(unsigned int fd, fmode_t mask)
 	struct file *file;
 
 	if (atomic_read(&files->count) == 1) {
-		file = __fcheck_files(files, fd);
+		file = __fcheck_files(files, fd);//获取已打开文件的 file 结构
 		if (!file || unlikely(file->f_mode & mask))
 			return 0;
 		return (unsigned long)file;

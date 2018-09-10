@@ -753,12 +753,10 @@ cleanup:
  *
  * d_inode(dentry)->i_rwsem: don't care
  *
- * Copy a list of attribute names into the buffer
- * provided, or compute the buffer size required.
- * Buffer is NULL to compute the size of the buffer required.
+ * 将属性名称列表复制到提供的缓冲区中，或计算所需的缓冲区大小。
+ * 缓冲区为NULL以计算所需缓冲区的大小。
  *
- * Returns a negative error number on failure, or the number of bytes
- * used / required on success.
+ * 返回失败时的负错误号，或成功时使用/需要的字节数。
  */
 ssize_t
 ext4_listxattr(struct dentry *dentry, char *buffer, size_t buffer_size)
@@ -783,8 +781,7 @@ errout:
 }
 
 /*
- * If the EXT4_FEATURE_COMPAT_EXT_ATTR feature of this file system is
- * not set, set it.
+ * 当文件系统的 EXT4_FEATURE_COMPAT_EXT_ATTR 属性未设置时，设置它
  */
 static void ext4_xattr_update_super_block(handle_t *handle,
 					  struct super_block *sb)

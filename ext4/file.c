@@ -459,9 +459,8 @@ static int ext4_file_open(struct inode * inode, struct file * filp)
 }
 
 /*
- * ext4_llseek() handles both block-mapped and extent-mapped maxbytes values
- * by calling generic_file_llseek_size() with the appropriate maxbytes
- * value for each.
+ * ext4_llseek() 通过调用generic_file_llseek_size()
+ * 以及每个值的相应maxbytes值来处理块映射和扩展区映射的maxbytes值。
  */
 loff_t ext4_llseek(struct file *file, loff_t offset, int whence)
 {
@@ -494,10 +493,11 @@ loff_t ext4_llseek(struct file *file, loff_t offset, int whence)
 	return vfs_setpos(file, offset, maxbytes);
 }
 
+//定义文件的操作
 const struct file_operations ext4_file_operations = {
 	.llseek		= ext4_llseek,
-	.read_iter	= ext4_file_read_iter,
-	.write_iter	= ext4_file_write_iter,
+	.read_iter	= ext4_file_read_iter,//读文件操作
+	.write_iter	= ext4_file_write_iter,//写文件操作
 	.unlocked_ioctl = ext4_ioctl,
 #ifdef CONFIG_COMPAT
 	.compat_ioctl	= ext4_compat_ioctl,
@@ -512,11 +512,11 @@ const struct file_operations ext4_file_operations = {
 	.splice_write	= iter_file_splice_write,
 	.fallocate	= ext4_fallocate,
 };
-
+//定义文件 inode 的操作
 const struct inode_operations ext4_file_inode_operations = {
-	.setattr	= ext4_setattr,
-	.getattr	= ext4_file_getattr,
-	.listxattr	= ext4_listxattr,
+	.setattr	= ext4_setattr,	//设置属性
+	.getattr	= ext4_file_getattr,	//获取属性
+	.listxattr	= ext4_listxattr,	
 	.get_acl	= ext4_get_acl,
 	.set_acl	= ext4_set_acl,
 	.fiemap		= ext4_fiemap,

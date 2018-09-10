@@ -368,7 +368,7 @@ int rw_verify_area(int read_write, struct file *file, const loff_t *ppos, size_t
 	loff_t pos;
 	int retval = -EINVAL;
 
-	inode = file_inode(file);
+	inode = file_inode(file);	//获取文件的 inode 结构
 	if (unlikely((ssize_t) count < 0))
 		return retval;
 	pos = *ppos;
@@ -434,27 +434,33 @@ ssize_t kernel_read(struct file *file, void *buf, size_t count, loff_t *pos)
 }
 EXPORT_SYMBOL(kernel_read);
 
+/*
+ * file:已打开文件的 file 结构，该结构是由 fd 而来
+ * buf:用户空间的缓冲区，就是内核将读取到的数据拷贝到这里
+ * count:将要读取的字节
+ * pos:文件当前读写位置
+ */
 ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 {
 	ssize_t ret;
 
-	if (!(file->f_mode & FMODE_READ))
+	if (!(file->f_mode & FMODE_READ))//检查文件是否已经是在读状态
 		return -EBADF;
-	if (!(file->f_mode & FMODE_CAN_READ))
+	if (!(file->f_mode & FMODE_CAN_READ))//检查文件是否可读
 		return -EINVAL;
-	if (unlikely(!access_ok(VERIFY_WRITE, buf, count)))
+	if (unlikely(!access_ok(VERIFY_WRITE, buf, count)))//检查用户态的 buf 是否有效，VERIFY_WRITE 表示 buf 是否可写
 		return -EFAULT;
 
-	ret = rw_verify_area(READ, file, pos, count);
+	ret = rw_verify_area(READ, file, pos, count);//检查待访问文件部分是否有冲突的强制锁
 	if (!ret) {
 		if (count > MAX_RW_COUNT)
 			count =  MAX_RW_COUNT;
-		ret = __vfs_read(file, buf, count, pos);
-		if (ret > 0) {
-			fsnotify_access(file);
-			add_rchar(current, ret);
+		ret = __vfs_read(file, buf, count, pos);//实际对文件进行读操作
+		if (ret > 0) {	//若读操作返回值大于 0, 则说明数据读取成功，ret 表示实际读取的字节数
+			fsnotify_access(file);	//调用函数通知文件被读取
+			add_rchar(current, ret);	//增加当前进程读取的字节数
 		}
-		inc_syscr(current);
+		inc_syscr(current);	//增加当前进程 read 系统调用的次数
 	}
 
 	return ret;
@@ -558,11 +564,13 @@ ssize_t vfs_write(struct file *file, const char __user *buf, size_t count, loff_
 	return ret;
 }
 
+//读取当前位置
 static inline loff_t file_pos_read(struct file *file)
 {
 	return file->f_pos;
 }
 
+//更新当前位置
 static inline void file_pos_write(struct file *file, loff_t pos)
 {
 	file->f_pos = pos;
@@ -574,10 +582,10 @@ ssize_t ksys_read(unsigned int fd, char __user *buf, size_t count)
 	ssize_t ret = -EBADF;
 
 	if (f.file) {
-		loff_t pos = file_pos_read(f.file);
-		ret = vfs_read(f.file, buf, count, &pos);
-		if (ret >= 0)
-			file_pos_write(f.file, pos);
+		loff_t pos = file_pos_read(f.file);//先读当前文件的读写位置
+		ret = vfs_read(f.file, buf, count, &pos);//实际去读取文件内容
+		if (ret >= 0)//当读取文件内容大于0时
+			file_pos_write(f.file, pos);//更新当前文件读写位置
 		fdput_pos(f);
 	}
 	return ret;
