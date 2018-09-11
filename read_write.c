@@ -395,15 +395,15 @@ int rw_verify_area(int read_write, struct file *file, const loff_t *ppos, size_t
 static ssize_t new_sync_read(struct file *filp, char __user *buf, size_t len, loff_t *ppos)
 {
 	struct iovec iov = { .iov_base = buf, .iov_len = len };
-	struct kiocb kiocb;
-	struct iov_iter iter;
+	struct kiocb kiocb;//用来跟踪记录I/O操作的完成状态
+	struct iov_iter iter;//用户和内核之间传递数据用
 	ssize_t ret;
 
-	init_sync_kiocb(&kiocb, filp);
-	kiocb.ki_pos = *ppos;
-	iov_iter_init(&iter, READ, &iov, 1, len);
+	init_sync_kiocb(&kiocb, filp);//初始化 kiocb 数据结构
+	kiocb.ki_pos = *ppos;	//给 kiocb 数据结构的 ki_pos 属性赋值
+	iov_iter_init(&iter, READ, &iov, 1, len);//用iov 结构体初始化 iter 结构体
 
-	ret = call_read_iter(filp, &kiocb, &iter);
+	ret = call_read_iter(filp, &kiocb, &iter);//调用file->f_op->read_iter(kio, iter);函数
 	BUG_ON(ret == -EIOCBQUEUED);
 	*ppos = kiocb.ki_pos;
 	return ret;

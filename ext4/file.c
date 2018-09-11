@@ -64,14 +64,18 @@ static ssize_t ext4_dax_read_iter(struct kiocb *iocb, struct iov_iter *to)
 
 static ssize_t ext4_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
 {
+	/*	
+	 * EXT4_SB(file_inode(iocb->ki_filp)->i_sb)：先获取 iocb 指向的文件，然后获取文件对应的 super_block 
+	 * 最后返回 super_block 对应文件系统的私有指针，最后判断文件系统的 s_ext4_flags 值是否为 1
+	 */
 	if (unlikely(ext4_forced_shutdown(EXT4_SB(file_inode(iocb->ki_filp)->i_sb))))
 		return -EIO;
 
 	if (!iov_iter_count(to))
 		return 0; /* skip atime */
 
-#ifdef CONFIG_FS_DAX
-	if (IS_DAX(file_inode(iocb->ki_filp)))
+#ifdef CONFIG_FS_DAX//判断内核是否配置了CONFIG_FS_DAX(直接访问)
+	if (IS_DAX(file_inode(iocb->ki_filp)))//判断文件的打开方式是否为直接访问模式
 		return ext4_dax_read_iter(iocb, to);
 #endif
 	return generic_file_read_iter(iocb, to);

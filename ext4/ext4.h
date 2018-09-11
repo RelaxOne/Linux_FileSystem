@@ -1496,6 +1496,7 @@ struct ext4_sb_info {
 	struct dax_device *s_daxdev;
 };
 
+//返回文件系统私有信息
 static inline struct ext4_sb_info *EXT4_SB(struct super_block *sb)
 {
 	return sb->s_fs_info;
@@ -1817,6 +1818,7 @@ static inline bool ext4_has_incompat_features(struct super_block *sb)
 #define EXT4_FLAGS_RESIZING	0
 #define EXT4_FLAGS_SHUTDOWN	1
 
+//判断sbi 结构体的 s_ext4_flags 属性是否为 1 
 static inline int ext4_forced_shutdown(struct ext4_sb_info *sbi)
 {
 	return test_bit(EXT4_FLAGS_SHUTDOWN, &sbi->s_ext4_flags);

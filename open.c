@@ -1086,7 +1086,7 @@ EXPORT_SYMBOL(filp_clone_open);
 long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
 {
 	struct open_flags op;
-	int fd = build_open_flags(flags, mode, &op);
+	int fd = build_open_flags(flags, mode, &op);//设置需要打开文件的flags（其结构体为open_flags）
 	struct filename *tmp;
 
 	if (fd)
@@ -1096,7 +1096,7 @@ long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
 	if (IS_ERR(tmp))
 		return PTR_ERR(tmp);
 
-	fd = get_unused_fd_flags(flags);
+	fd = get_unused_fd_flags(flags);//获取一个可用的fd
 	if (fd >= 0) {
 		struct file *f = do_filp_open(dfd, tmp, &op);
 		if (IS_ERR(f)) {

@@ -3563,6 +3563,7 @@ out2:
 	return file;
 }
 
+//根据文件名字进行搜索，如果不存在需要进行文件创建
 struct file *do_filp_open(int dfd, struct filename *pathname,
 		const struct open_flags *op)
 {
